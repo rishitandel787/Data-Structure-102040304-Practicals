@@ -1,0 +1,159 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a linked list node
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// ==================== DISPLAY OPERATION ====================
+void display(struct Node* head) {
+    struct Node* temp = head;
+    printf("Linked List: ");
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+// ==================== INSERTION OPERATIONS ====================
+
+// 1. Insert at the Beginning
+void insertAtBeginning(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = (*head_ref);
+    (*head_ref) = new_node;
+    printf("Inserted %d at the beginning.\n", new_data);
+}
+
+// 2. Insert at the End
+void insertAtEnd(struct Node** head_ref, int new_data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    struct Node* last = *head_ref;
+    
+    new_node->data = new_data;
+    new_node->next = NULL;
+
+    // If the list is empty, make the new node the head
+    if (*head_ref == NULL) {
+        *head_ref = new_node;
+        printf("Inserted %d at the end.\n", new_data);
+        return;
+    }
+
+    // Otherwise, traverse to the last node
+    while (last->next != NULL) {
+        last = last->next;
+    }
+
+    last->next = new_node;
+    printf("Inserted %d at the end.\n", new_data);
+}
+
+// 3. Insert After a Given Node
+void insertAfterNode(struct Node* prev_node, int new_data) {
+    if (prev_node == NULL) {
+        printf("The given previous node cannot be NULL.\n");
+        return;
+    }
+
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = new_data;
+    new_node->next = prev_node->next;
+    prev_node->next = new_node;
+    printf("Inserted %d after node %d.\n", new_data, prev_node->data);
+}
+
+// ==================== DELETION OPERATIONS ====================
+
+// 1. Delete First Node
+void deleteFirst(struct Node** head_ref) {
+    if (*head_ref == NULL) {
+        printf("List is empty. Cannot delete.\n");
+        return;
+    }
+
+    struct Node* temp = *head_ref;
+    *head_ref = temp->next; // Move head to the next node
+    printf("Deleted first node with value %d.\n", temp->data);
+    free(temp); // Free memory
+}
+
+// 2. Delete Last Node
+void deleteLast(struct Node** head_ref) {
+    if (*head_ref == NULL) {
+        printf("List is empty. Cannot delete.\n");
+        return;
+    }
+
+    struct Node* temp = *head_ref;
+
+    // If there is only one node in the list
+    if (temp->next == NULL) {
+        printf("Deleted last node with value %d.\n", temp->data);
+        free(temp);
+        *head_ref = NULL;
+        return;
+    }
+
+    // Traverse until the second last node
+    struct Node* prev = NULL;
+    while (temp->next != NULL) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    prev->next = NULL; // Unlink the last node
+    printf("Deleted last node with value %d.\n", temp->data);
+    free(temp);
+}
+
+// 3. Delete Node After a Given Node
+void deleteAfterNode(struct Node* prev_node) {
+    if (prev_node == NULL || prev_node->next == NULL) {
+        printf("No node exists after the given node to delete.\n");
+        return;
+    }
+
+    struct Node* temp = prev_node->next; // Node to be deleted
+    prev_node->next = temp->next;       // Bypass the node
+    printf("Deleted node with value %d after node %d.\n", temp->data, prev_node->data);
+    free(temp);
+}
+
+// ==================== MAIN FUNCTION ====================
+int main() {
+    struct Node* head = NULL;
+
+    printf("=== Singly Linked List Demonstration ===\n\n");
+
+    // Demonstrating Insertions
+    printf("--- Insertion Operations ---\n");
+    insertAtEnd(&head, 20);       // List: 20
+    insertAtBeginning(&head, 10); // List: 10 -> 20
+    insertAtEnd(&head, 40);       // List: 10 -> 20 -> 40
+    
+    // Insert 30 after the node containing 20 (which is the second node)
+    insertAfterNode(head->next, 30); // List: 10 -> 20 -> 30 -> 40
+    
+    display(head);
+    printf("\n");
+
+    // Demonstrating Deletions
+    printf("--- Deletion Operations ---\n");
+    
+    deleteFirst(&head);          // Deletes 10 (List: 20 -> 30 -> 40)
+    display(head);
+
+    deleteLast(&head);           // Deletes 40 (List: 20 -> 30)
+    display(head);
+
+    // Delete node after the head node (deletes node after 20, which is 30)
+    deleteAfterNode(head);       // List: 20
+    display(head);
+
+    return 0;
+}
